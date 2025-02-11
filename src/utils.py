@@ -1,0 +1,73 @@
+import os
+import dill
+
+from src.logger import logging
+from src.exception import CustomException
+
+from sklearn.metrics import r2_score
+from sklearn.model_selection import GridSearchCV
+
+
+def save_object(file_path: str = None, obj=None):
+    try:
+        dir_path = os.path.dirname(file_path)
+        os.makedirs(dir_path, exist_ok=True)
+
+        with open(file_path, "wb") as file_obj:
+            dill.dump(obj, file_obj)
+
+    except Exception as e:
+        logging.info(f"Error in utils.py/save_object(): {e}")
+        raise CustomException(e)
+
+
+def load_object(file_path: str = None):
+    try:
+        with open(file_path, "rb") as file_obj:
+            return dill.load(file_obj)
+    except Exception as e:
+        logging.info(f"Error in utils.py/load_object(): {e}")
+        raise CustomException(e)
+
+
+def evaluate_models(
+    x_train=None,
+    y_train=None,
+    x_test=None,
+    y_test=None,
+    Models: dict = None,
+    Params: dict = None,
+) -> dict:
+    try:
+        Model_scores = {}
+        for i in range(len(list(Models))):
+            model_name = list(Models.keys())[i]
+            logging.info(f'Started training "{model_name}" model')
+
+            model = list(Models.values())[i]
+            param = Params[model_name]
+
+            gs = GridSearchCV(estimator=model, param_grid=param, cv=3)
+            gs.fit(x_train, y_train)
+
+            model.set_params(**gs.best_params_)
+            model.fit(x_train, y_train)
+
+            y_train_pred = model.predict(x_train, y_train)
+            y_test_pred = model.predict(x_test, y_test)
+
+            score_train = r2_score(y_train, y_train_pred)
+            score_test = r2_score(y_test, y_test_pred)
+
+            Model_scores[model_name] = [model, score_train, score_test]
+            logging.info(
+                f'Finished training "{model_name}" with test set r2_score of: {score_test * 100:.2f}%'
+            )
+        Model_scores = dict(
+            sorted(Model_scores.items(), key=lambda item: item[1][2], reverse=True)
+        )
+        return Model_scores
+
+    except Exception as e:
+        logging.info(f"Error in utils.py/evaluate_models.py(): {e}")
+        raise CustomException(e)
