@@ -23,6 +23,7 @@ Repo_name = "P-1_Beginner_California-House-Price-Prediction"
 Author_name = "vikas-gits-good"
 Author_email = "vikas.c.conappa@protonmail.com"
 
+
 setup(
     name="California-House-Price-Prediction",
     version=__version__,

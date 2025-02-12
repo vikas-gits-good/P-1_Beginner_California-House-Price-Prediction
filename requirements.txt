@@ -12,3 +12,4 @@ sweetviz
 scikit-learn
 imbalanced-learn
 dill
+-e .

@@ -18,6 +18,8 @@ folder_files_list = [
     # "setup.py",
     "research/01_Vcc_Trials.ipynb",
     "templates/index.html",
+    "artifacts/Data/delete.csv",
+    "artifacts/DataFrame/delete.csv",
 ]
 
 for path in folder_files_list:

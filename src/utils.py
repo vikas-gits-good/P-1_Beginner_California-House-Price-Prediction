@@ -1,11 +1,13 @@
 import os
 import dill
+from typing import Literal
 
 from src.logger import logging
 from src.exception import CustomException
 
 from sklearn.metrics import r2_score
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+# from optuna import ...
 
 
 def save_object(file_path: str = None, obj=None):
@@ -37,6 +39,7 @@ def evaluate_models(
     y_test=None,
     Models: dict = None,
     Params: dict = None,
+    Method: Literal["GridSearchCV", "RandomizedSearchCV", "Optuna"] = "GridSearchCV",
 ) -> dict:
     try:
         Model_scores = {}
@@ -47,8 +50,23 @@ def evaluate_models(
             model = list(Models.values())[i]
             param = Params[model_name]
 
-            gs = GridSearchCV(estimator=model, param_grid=param, cv=3)
-            gs.fit(x_train, y_train)
+            if Method == "GridSearchCV":
+                gs = GridSearchCV(estimator=model, param_grid=param, cv=3, n_jobs=-1)
+                gs.fit(x_train, y_train)
+
+            elif Method == "RandomizedSearchCV":
+                gs = RandomizedSearchCV(
+                    estimator=model,
+                    param_distributions=param,
+                    cv=3,
+                    n_jobs=-1,
+                    n_iter=30,
+                    random_state=45,
+                )
+                gs.fit(x_train, y_train)
+
+            elif Method == "Optuna":
+                return None
 
             model.set_params(**gs.best_params_)
             model.fit(x_train, y_train)
@@ -69,5 +87,5 @@ def evaluate_models(
         return Model_scores
 
     except Exception as e:
-        logging.info(f"Error in utils.py/evaluate_models.py(): {e}")
+        logging.info(f"Error in utils.py/evaluate_models(): {e}")
         raise CustomException(e)

@@ -23,6 +23,9 @@ class DataIngestion:
         try:
             logging.info('Entered "initiate_data_ingestion" method')
             self.df = pd.read_csv(self.data_ings_config.raw_data_path)
+            self.df["ocean_proximity"] = self.df["ocean_proximity"].replace(
+                to_replace={"<1H OCEAN": "Less than 1H OCEAN"}
+            )
             logging.info("Read input data successfully")
 
             os.makedirs(
@@ -53,9 +56,3 @@ class DataIngestion:
         except Exception as e:
             logging.info(f"Error: {e}")
             raise CustomException(e)
-
-
-if __name__ == "__main__":
-    # Data Ingestion
-    obj = DataIngestion()
-    train_path, test_path = obj.initiate_data_ingestion()
