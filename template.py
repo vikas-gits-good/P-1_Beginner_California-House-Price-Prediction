@@ -21,6 +21,7 @@ folder_files_list = [
     "artifacts/Data/delete.csv",
     "artifacts/DataFrame/delete.csv",
     "artifacts/Models/delete.csv",
+    "artifacts/Scores/delete.csv",
 ]
 
 for path in folder_files_list:

@@ -19,7 +19,8 @@ from sklearn.pipeline import Pipeline
 
 @dataclass
 class ModelTrainerConfig:
-    model_save_path: str = "../../artifacts/Models"
+    model_save_path: str = "artifacts/Models"
+    scores_save_path: str = "artifacts/Scores"
 
 
 class ModelTrainer:
@@ -41,6 +42,7 @@ class ModelTrainer:
 
     def train_models(self):
         try:
+            logging.info("Successfully entered 'train_models' method")
             df_train = pd.read_csv(self.train_path)
             logging.info("Successfully read train dataset")
 
@@ -67,7 +69,7 @@ class ModelTrainer:
             ]
             ordn_cols = [
                 [
-                    "Less than 1H from OCEAN",
+                    "Less than 1H OCEAN",
                     "NEAR BAY",
                     "NEAR OCEAN",
                     "ISLAND",
@@ -121,13 +123,19 @@ class ModelTrainer:
                 .values[0]
                 * 100
             )
+            # print(best_model_key, best_model_score)
             best_model = models[best_model_key]
 
-            best_model_name = f"{datetime.now().strftime('%Y-%m-%d_%H:%M:S')}_{best_model_key}_{best_model_score:.4f}_%.pkl"
+            best_model_name = f"{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}_{best_model_key}_{best_model_score:.4f}_%.pkl"
+            scores_names = f"{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}_Scores.pkl"
             best_model_save_path = os.path.join(
                 self.md_tr_cfg.model_save_path, best_model_name
             )
+            scores_save_path = os.path.join(
+                self.md_tr_cfg.scores_save_path, scores_names
+            )
             save_object(file_path=best_model_save_path, obj=best_model)
+            save_object(file_path=scores_save_path, obj=df_scores)
             logging.info(f"Best performing model: {best_model_key} successfully saved")
 
         except Exception as e:

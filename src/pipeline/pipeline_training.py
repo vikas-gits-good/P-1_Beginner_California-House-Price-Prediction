@@ -1,6 +1,5 @@
+import os
 import pandas as pd
-
-# import pickle
 from typing import Literal
 
 from src.logger import logging
@@ -123,6 +122,7 @@ class MultiModelEstimator(BaseEstimator, TransformerMixin):
                         cv=self.cv,
                         scoring=self.scoring,
                         refit=True,
+                        n_jobs=-1,
                     )
                     gs.fit(X, y)
 
@@ -228,6 +228,8 @@ class PipelineConstructor:
         method: Literal["z_score", "iqr"] = "z_score",
     ):
         try:
+            # Temporary workaraound. The dropped columns sent here through self.vols_numr is causing KeyError
+            columns = [col for col in data.columns if data[col].dtypes != "O"]
             df = data.copy()
             for col in columns:
                 if method == "z_score":
@@ -313,9 +315,11 @@ class PipelineConstructor:
                 steps=[
                     ("ppln_prpc", ppln_prpc),
                     (
-                        "Save_DF",
+                        "Save_DF_pre_proc",
                         Save_DataFrame(
-                            save_path=r"../../artifacts/DataFrames/df_prpc.pkl"
+                            save_path=os.path.join(
+                                "artifacts/DataFrames", "df_prpc.pkl"
+                            )
                         ),
                     ),
                     (
@@ -325,9 +329,11 @@ class PipelineConstructor:
                     ("Feature_Selection", SelectKBest(score_func=f_regression, k=50)),
                     ("Feature_Decomposition", PCA(n_components=30, random_state=42)),
                     (
-                        "Save_DF",
+                        "Save_DF_feat_engn",
                         Save_DataFrame(
-                            save_path=r"../../artifacts/DataFrames/df_fteg.pkl"
+                            save_path=os.path.join(
+                                "artifacts/DataFrames", "df_fteg.pkl"
+                            )
                         ),
                     ),
                 ]

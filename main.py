@@ -1,8 +1,8 @@
-from logger import logging
-from exception import CustomException
+from src.logger import logging
+from src.exception import CustomException
 
-from components.data_ingestion import DataIngestion
-from components.model_training import ModelTrainer
+from src.components.data_ingestion import DataIngestion
+from src.components.model_training import ModelTrainer
 
 
 def Main():
@@ -15,6 +15,7 @@ def Main():
 
         logging.info("Initiating Model Training")
         mt = ModelTrainer(train_path, test_path, best_model_selection_metric="r2_score")
+        mt.train_models()
 
         logging.info("Best model saved and ready for user input prediction")
 
