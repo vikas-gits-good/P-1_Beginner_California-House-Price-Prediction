@@ -9,8 +9,7 @@ __pycache__/
 # Distribution / packaging
 .vscode
 *.env
-artifacts/DataFrames/
-artifacts/Scores/
+artifacts/
 logs/
 .github
 .Python
