@@ -1,11 +1,18 @@
 import os
 import dill
-from typing import Literal
+from typing import Literal, Union
+import pandas as pd
+import numpy as np
 
 from src.logger import logging
 from src.exception import CustomException
 
-from sklearn.metrics import r2_score
+from sklearn.metrics import (
+    r2_score,
+    mean_absolute_error,
+    mean_squared_error,
+    root_mean_squared_error,
+)
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 # from optuna import ...
 
@@ -30,6 +37,29 @@ def load_object(file_path: str = None):
     except Exception as e:
         logging.info(f"Error in utils.py/load_object(): {e}")
         raise CustomException(e)
+
+
+def model_scores(
+    y_true,
+    y_pred: pd.DataFrame = None,
+    # score: Literal["All", "r2_score", "mean_square_error"] = "All",
+    # model_type:Literal['Classification','Regression']='Regression'
+) -> pd.DataFrame:
+    scores_dict = {
+        "mean_absolute_error": mean_absolute_error,
+        "mean_squared_error": mean_squared_error,
+        "root_mean_squared_error": root_mean_squared_error,
+        "r2_score": r2_score,
+    }
+    index_list = list(scores_dict.keys())
+    columns_list = list(y_pred.columns)
+    df_scores = pd.DataFrame(index=index_list, columns=columns_list)
+
+    for index in index_list:
+        for column in columns_list:
+            df_scores.loc[index, column] = scores_dict[index](y_true, y_pred[column])
+
+    return df_scores
 
 
 def evaluate_models(

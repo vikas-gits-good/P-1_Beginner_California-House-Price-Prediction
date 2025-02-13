@@ -114,7 +114,7 @@ class MultiModelEstimator(BaseEstimator, TransformerMixin):
         """
         try:
             for name, model in self.models.items():
-                logging.info(f"Running {self.method} for {name}.")
+                logging.info(f"Fitting {self.method} for {name}")
 
                 if self.method == "GridSearchCV":
                     gs = GridSearchCV(
@@ -166,6 +166,7 @@ class MultiModelEstimator(BaseEstimator, TransformerMixin):
             self.models_ = {}
 
             for name, grid_search in self.grid_searches.items():
+                logging.info(f"Predicting {self.method} for {name}")
                 best_model = grid_search.best_estimator_
                 if hasattr(best_model, "predict_proba"):
                     self.predictions_[name] = best_model.predict_proba(X)
@@ -211,7 +212,7 @@ class PipelineConstructor:
             df["total_rooms/house"] = df["total_rooms"] / df["households"]
             df["popl/house"] = df["population"] / df["households"]
             df["bedroom - room"] = df["total_rooms"] - df["total_bedrooms"]
-            if self.cols_drop is not None:
+            if self.cols_drop:
                 df.drop(columns=self.cols_drop, inplace=True)
             return df
 

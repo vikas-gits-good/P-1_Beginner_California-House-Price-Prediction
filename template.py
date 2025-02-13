@@ -20,6 +20,7 @@ folder_files_list = [
     "templates/index.html",
     "artifacts/Data/delete.csv",
     "artifacts/DataFrame/delete.csv",
+    "artifacts/Models/delete.csv",
 ]
 
 for path in folder_files_list:
@@ -27,7 +28,7 @@ for path in folder_files_list:
     file_dir, file_name = os.path.split(file_path)
 
     if file_dir != "":
-        os.makedirs(file_dir, exist_ok="True")
+        os.makedirs(file_dir, exist_ok=True)
         logging.info(f'Created directory "{file_dir}" for file "{file_name}"')
 
     if (not os.path.exists(path)) or (os.path.getsize(path) == 0):
