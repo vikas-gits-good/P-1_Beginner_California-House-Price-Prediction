@@ -12,4 +12,5 @@ sweetviz
 scikit-learn
 imbalanced-learn
 dill
+flask
 -e .

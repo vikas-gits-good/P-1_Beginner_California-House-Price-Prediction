@@ -21,6 +21,7 @@ from sklearn.pipeline import Pipeline
 class ModelTrainerConfig:
     model_save_path: str = "artifacts/Models"
     scores_save_path: str = "artifacts/Scores"
+    ppln_save_path: str = "artifacts/Pipeline"
 
 
 class ModelTrainer:
@@ -42,7 +43,7 @@ class ModelTrainer:
 
     def train_models(self):
         try:
-            logging.info("Successfully entered 'train_models' method")
+            logging.info("Entered 'train_models' method")
             df_train = pd.read_csv(self.train_path)
             logging.info("Successfully read train dataset")
 
@@ -86,6 +87,14 @@ class ModelTrainer:
             ppln_prpc = pc.create_pipeline()
             logging.info("Successfully acquired the training pipeline object")
 
+            ppln_prpc_save = pc.create_pipeline()
+            _ = ppln_prpc_save.fit_transform(x_train, y_train)
+            ppln_save_path = os.path.join(
+                self.md_tr_cfg.ppln_save_path, "ppln_prpc.pkl"
+            )
+            save_object(file_path=ppln_save_path, obj=ppln_prpc_save)
+            logging.info("Pipeline saved to artifacts/Pipeline/ppln_prc.pkl")
+
             ppln_train = Pipeline(
                 steps=[
                     ("DataProcessing", ppln_prpc),
@@ -117,16 +126,17 @@ class ModelTrainer:
                 .sort_values(ascending=False)
                 .index[0]
             )
-            best_model_score = (
-                df_scores.loc[self.best_model_metric, :]
-                .sort_values(ascending=False)
-                .values[0]
-                * 100
-            )
+            # best_model_score = (
+            #     df_scores.loc[self.best_model_metric, :]
+            #     .sort_values(ascending=False)
+            #     .values[0]
+            #     * 100
+            # )
             # print(best_model_key, best_model_score)
             best_model = models[best_model_key]
 
-            best_model_name = f"{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}_{best_model_key}_{best_model_score:.4f}_%.pkl"
+            # best_model_name = f"{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}_{best_model_key}_{best_model_score:.4f}_%.pkl"
+            best_model_name = "best_model.pkl"
             scores_names = f"{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}_Scores.pkl"
             best_model_save_path = os.path.join(
                 self.md_tr_cfg.model_save_path, best_model_name

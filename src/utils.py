@@ -1,10 +1,11 @@
 import os
 import dill
-from typing import Literal, Union
+from typing import Literal
 import pandas as pd
 
 from src.logger import logging
 from src.exception import CustomException
+from src.pipeline.pipeline_training import PipelineConstructor
 
 from sklearn.metrics import (
     r2_score,
